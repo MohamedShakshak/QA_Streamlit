@@ -1,6 +1,7 @@
-streamlit==1.41.1
-transformers==4.33.3
-torch>=1.11.0
+streamlit
+transformers
+torchvision 
+torch
 Pillow
-tokenizers==0.13.3
+tokenizers
 requests
