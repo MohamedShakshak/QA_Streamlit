@@ -3,3 +3,10 @@ transformers
 torchvision 
 torch
 Pillow
+tensorflow
+keras
+numpy
+nltk
+tqdm
+requests
+rouge-score
