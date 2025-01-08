@@ -58,7 +58,7 @@ def beam_search_predictions(image, beam_index = 3):
         temp = []
         for s in start_word:
             par_caps = sequence.pad_sequences([s[0]], maxlen=max_length, padding='post')
-            preds = model.predict([image,par_caps], verbose=0)
+            preds = caption_model.predict([image,par_caps], verbose=0)
             word_preds = np.argsort(preds[0])[-beam_index:]
             # Getting the top <beam_index>(n) predictions and creating a 
             # new list so as to put them via the model again
