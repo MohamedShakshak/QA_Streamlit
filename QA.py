@@ -26,9 +26,8 @@ fe_model, caption_model, wordtoix, ixtoword = load_models_and_tokenizers()
 max_length = 51
 
 # Preprocessing Functions
-def preprocess(image_path):
-    img = load_img(image_path, target_size=(299, 299))
-    x = img_to_array(img)
+def preprocess(image):
+    x = img_to_array(image)
     x = np.expand_dims(x, axis=0)
     x = preprocess_input(x)
     return x
