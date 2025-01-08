@@ -10,3 +10,4 @@ nltk
 tqdm
 requests
 rouge-score
+matplotlib
