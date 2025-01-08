@@ -133,9 +133,9 @@ if image:
             greedy_caption = greedySearch(encoded_image)
         st.success("Captioning Completed!")
         st.write(f"**Greedy Search Caption:** {greedy_caption}")
-        st.write(f"**Beam Search, K = 3:** {beam_search_predictions(image, beam_index = 3)}")
-        st.write(f"**Beam Search, K = 5:** {beam_search_predictions(image, beam_index = 3)}")
-        st.write(f"**Beam Search, K = 7:** {beam_search_predictions(image, beam_index = 3)}")
+        st.write(f"**Beam Search, K = 3:** {beam_search_predictions(encoded_image, beam_index = 3)}")
+        st.write(f"**Beam Search, K = 5:** {beam_search_predictions(encoded_image, beam_index = 3)}")
+        st.write(f"**Beam Search, K = 7:** {beam_search_predictions(encoded_image, beam_index = 3)}")
         
 else:
     st.info("Please upload an image or provide a valid URL to proceed.")
