@@ -1,38 +1,30 @@
 import streamlit as st
-from transformers import pipeline
-from PIL import Image
-import requests
-import os
 import numpy as np
+import pickle
 from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.sequence import pad_sequences
 from tensorflow.keras.applications.inception_v3 import preprocess_input
 from tensorflow.keras.preprocessing.image import load_img, img_to_array
-import pickle
-
-os.environ["HF_HUB_DISABLE_SYMLINKS_WARNING"] = "1"
+from PIL import Image
+import requests
+import matplotlib.pyplot as plt
+import os
 
 # Load Models and Tokenizers
 @st.cache_resource
-def load_vqa_pipeline():
-    return pipeline("visual-question-answering", model="Salesforce/blip-vqa-base")
-
-@st.cache_resource
-def load_captioning_models():
+def load_models_and_tokenizers():
     fe_model = load_model("inceptionV3_features_model.h5")
-    caption_model = load_model('model.keras')
+    caption_model = load_model("model.keras")
     with open('wordtoix.pkl', 'rb') as file:
         wordtoix = pickle.load(file)
     with open('ixtoword.pkl', 'rb') as file:
         ixtoword = pickle.load(file)
     return fe_model, caption_model, wordtoix, ixtoword
 
-# Load resources
-pipe = load_vqa_pipeline()
-fe_model, caption_model, wordtoix, ixtoword = load_captioning_models()
+fe_model, caption_model, wordtoix, ixtoword = load_models_and_tokenizers()
 max_length = 51
 
-# Image Preprocessing Functions
+# Preprocessing Functions
 def preprocess(image_path):
     img = load_img(image_path, target_size=(299, 299))
     x = img_to_array(img)
@@ -60,26 +52,19 @@ def greedySearch(photo):
     return ' '.join(in_text.split()[1:-1])
 
 # Streamlit App
-st.title("Image Analysis App")
-st.write("Upload an image or provide a URL, then choose a task: Visual Question Answering or Image Captioning.")
+st.title("Image Captioning App")
+st.write("Upload an image or provide a URL to generate captions.")
 
-# File uploader for image
+# Image Upload or URL Input
 uploaded_file = st.file_uploader("Upload an image", type=["png", "jpg", "jpeg"])
-
-# URL input for image
 image_url = st.text_input("Or enter an image URL:")
 
 image = None
-image_path = None
-
-# Handle uploaded file
 if uploaded_file:
     image = Image.open(uploaded_file).convert("RGB")
     image_path = "temp_uploaded_image.jpg"
     image.save(image_path)
     st.image(image, caption="Uploaded Image", use_column_width=True)
-
-# Handle URL input
 elif image_url:
     try:
         response = requests.get(image_url, stream=True)
@@ -91,33 +76,17 @@ elif image_url:
     except Exception as e:
         st.error(f"Failed to load image from URL: {e}")
 
-# Choose Task: VQA or Image Captioning
+# Generate Captions
 if image:
-    task = st.radio("Choose a task:", ["Visual Question Answering", "Image Captioning"])
-
-    if task == "Visual Question Answering":
-        question = st.text_input("Ask a question about the image:")
-        if st.button("Get Answer"):
-            if question.strip():
-                with st.spinner("Analyzing..."):
-                    result = pipe(image, question)
-                st.success("Done!")
-                st.write(f"*Question:* {question}")
-                st.write(f"*Answer:* {result[0]['answer']}")
-            else:
-                st.warning("Please enter a question.")
-    
-    elif task == "Image Captioning":
-        if st.button("Generate Caption"):
-            with st.spinner("Generating caption..."):
-                encoded_image = encode(image_path)
-                encoded_image = encoded_image.reshape((1, 2048))
-                greedy_caption = greedySearch(encoded_image)
-            st.success("Caption Generated!")
-            st.write(f"**Caption:** {greedy_caption}")
-
+    if st.button("Generate Captions"):
+        with st.spinner("Generating captions..."):
+            encoded_image = encode(image_path)
+            encoded_image = encoded_image.reshape((1, 2048))
+            greedy_caption = greedySearch(encoded_image)
+        st.success("Captioning Completed!")
+        st.write(f"**Greedy Search Caption:** {greedy_caption}")
 else:
     st.info("Please upload an image or provide a valid URL to proceed.")
 
 st.write("---")
-st.write("Powered by [Hugging Face](https://huggingface.co/), [Streamlit](https://streamlit.io/), and TensorFlow.")
+st.write("Powered by [Streamlit](https://streamlit.io/) and TensorFlow")
