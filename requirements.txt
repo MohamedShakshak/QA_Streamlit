@@ -5,3 +5,10 @@ torch
 Pillow
 tokenizers
 requests
+tensorflow
+keras
+numpy
+nltk
+tqdm
+requests
+rouge-score
