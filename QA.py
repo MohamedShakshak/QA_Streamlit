@@ -32,10 +32,11 @@ def preprocess(image):
     x = preprocess_input(x)
     return x
 
-def encode(image_path):
-    image = preprocess(image)
-    fea_vec = fe_model.predict(image, verbose=0)
-    fea_vec = np.reshape(fea_vec, fea_vec.shape[1])
+def encode(image):
+    # Directly pass the image object to preprocess (no need for file path)
+    image_input = preprocess(image)
+    fea_vec = fe_model.predict(image_input, verbose=0)
+    fea_vec = np.reshape(fea_vec, fea_vec.shape[1])  # Flatten the feature vector
     return fea_vec
 
 def greedySearch(photo):
@@ -50,6 +51,7 @@ def greedySearch(photo):
         if word == 'endseq':
             break
     return ' '.join(in_text.split()[1:-1])
+
 def beam_search_predictions(image, beam_index=3):
     start = [wordtoix["startseq"]]
     start_word = [[start, 0.0]]
@@ -97,7 +99,6 @@ def beam_search_predictions(image, beam_index=3):
     final_caption = ' '.join(final_caption[1:])
     return final_caption
 
-
 # Streamlit App
 st.title("Image Captioning App")
 st.write("Upload an image or provide a URL to generate captions.")
@@ -127,14 +128,14 @@ elif image_url:
 if image:
     if st.button("Generate Captions"):
         with st.spinner("Generating captions..."):
-            encoded_image = encode(image)
-            encoded_image = encoded_image.reshape((1, 2048))
+            encoded_image = encode(image)  # Pass the image directly to the encode function
+            encoded_image = encoded_image.reshape((1, 2048))  # Ensure it has correct shape
             greedy_caption = greedySearch(encoded_image)
         st.success("Captioning Completed!")
         st.write(f"**Greedy Search Caption:** {greedy_caption}")
-        st.write(f"**Beam Search, K = 3:** {beam_search_predictions(encoded_image, beam_index = 3)}")
-        st.write(f"**Beam Search, K = 5:** {beam_search_predictions(encoded_image, beam_index = 3)}")
-        st.write(f"**Beam Search, K = 7:** {beam_search_predictions(encoded_image, beam_index = 3)}")
+        st.write(f"**Beam Search, K = 3:** {beam_search_predictions(image, beam_index=3)}")
+        st.write(f"**Beam Search, K = 5:** {beam_search_predictions(image, beam_index=5)}")
+        st.write(f"**Beam Search, K = 7:** {beam_search_predictions(image, beam_index=7)}")
         
 else:
     st.info("Please upload an image or provide a valid URL to proceed.")
