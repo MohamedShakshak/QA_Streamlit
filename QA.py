@@ -51,14 +51,14 @@ def greedySearch(photo):
         if word == 'endseq':
             break
     return ' '.join(in_text.split()[1:-1])
-def beam_search_predictions(image, beam_index = 3):
+def beam_search_predictions(image, beam_index=3):
     start = [wordtoix["startseq"]]
     start_word = [[start, 0.0]]
     while len(start_word[0][0]) < max_length:
         temp = []
         for s in start_word:
             par_caps = sequence.pad_sequences([s[0]], maxlen=max_length, padding='post')
-            preds = model.predict([image,par_caps], verbose=0)
+            preds = caption_model.predict([image, par_caps], verbose=0)  # Use caption_model here
             word_preds = np.argsort(preds[0])[-beam_index:]
             # Getting the top <beam_index>(n) predictions and creating a 
             # new list so as to put them via the model again
@@ -86,6 +86,7 @@ def beam_search_predictions(image, beam_index = 3):
 
     final_caption = ' '.join(final_caption[1:])
     return final_caption
+
 
 # Streamlit App
 st.title("Image Captioning App")
