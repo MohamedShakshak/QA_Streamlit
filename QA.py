@@ -33,7 +33,7 @@ def preprocess(image):
     return x
 
 def encode(image_path):
-    image = preprocess(image_path)
+    image = preprocess(image)
     fea_vec = fe_model.predict(image, verbose=0)
     fea_vec = np.reshape(fea_vec, fea_vec.shape[1])
     return fea_vec
@@ -127,7 +127,7 @@ elif image_url:
 if image:
     if st.button("Generate Captions"):
         with st.spinner("Generating captions..."):
-            encoded_image = encode(image_path)
+            encoded_image = encode(image)
             encoded_image = encoded_image.reshape((1, 2048))
             greedy_caption = greedySearch(encoded_image)
         st.success("Captioning Completed!")
