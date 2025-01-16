@@ -15,7 +15,7 @@ import os
 @st.cache_resource
 def load_models_and_tokenizers():
     fe_model = load_model("inceptionV3_features_model.h5")
-    caption_model = load_model("model.keras")
+    caption_model = load_model("model50.keras")
     with open('wordtoix.pkl', 'rb') as file:
         wordtoix = pickle.load(file)
     with open('ixtoword.pkl', 'rb') as file:
